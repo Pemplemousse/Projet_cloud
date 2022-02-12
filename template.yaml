@@ -96,19 +96,13 @@ resources:
           port_range_min: 443
           port_range_max: 443
 
-  ####### FLOATING IP & ATTACHMENT ########
+  ####### FLOATING IP ########
 
   FloatingIP_1:
     type: OS::Neutron::FloatingIP
     properties:
       floating_network: External-ENSSAT
-
-  FloatingIP_Attachment_1:
-    type: OS::Neutron::FloatingIPAssociation
-    properties:
-      floatingip_id: { get_resource: FloatingIP_1}
-      port_id: { get_resource: Port_1}
-    depends_on: [FloatingIP_1, Port_1]
+      port_id: { get_resource: Port_1 }
 
   ######## PORT ########
 
@@ -156,27 +150,31 @@ resources:
     properties:
       config: |
         #!/bin/sh
+        mkdir /config
+        echo "CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
+        GRANT ALL PRIVILEGES ON . TO 'username'@'localhost' WITH GRANT OPTION;
+        CREATE USER 'username'@'%' IDENTIFIED BY 'password';
+        GRANT ALL PRIVILEGES ON . TO 'username'@'%' WITH GRANT OPTION;
+        FLUSH PRIVILEGES;
+        " > /config/privilege.sql
+
         echo "version: '2'
         services:
             db:
                 image: mysql/mysql-server
-                command: --init-file /privilege.sql
+                container_name: sql
+                command: --init-file /config/privilege.sql
                 volumes:
                     - ~/.docker/mysql:/var/lib/mysql
-                    - /docker-entrypoint-initdb.d
+                    - /config/privilege.sql:/config/privilege.sql
                 ports:
-                    - "80:3306"
+                    - 80:3306
                 environment:
                     - MYSQL_DATABASE=enssapp
-                    - MYSQL_ROOT_PASSWORD=1234" > docker-compose.yml
-        cd / && docker-compose up
+                    - MYSQL_ROOT_PASSWORD=1234
+        " > docker-compose.yml
 
-  init_mysql_privileges:
-    type: OS::Heat::SoftwareConfig
-    properties:
-      config: |
-        #!/bin/sh
-        echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'pUr3&H0sHBabY'" > privilege.sql
+        cd / && docker-compose up
 
   # Set the docker-compose.yml file that will be used for 
   # building the back-end related containers
@@ -189,10 +187,10 @@ resources:
         services:
             nestjs:
                 image: enssapp/nestjs:latest
-                volumes:
-                    - ~/.docker/www:/var/www/html" > docker-compose.yml
+                container_name: nest
                 ports:
-                    - "80:3000"
+                    - 80:3000
+        " > docker-compose.yml
         cd / && docker-compose up
 
   # Init configuration :
@@ -211,10 +209,9 @@ resources:
     type: OS::Heat::MultipartMime
     properties:
       parts:
-      - config: {get_resource: init_mysql_privileges}
       - config: {get_resource: boot_user}
       - config: {get_resource: boot_docker_compose_mysql}
-    depends_on: [boot_user, boot_docker_compose_mysql, init_mysql_privileges]
+    depends_on: [boot_user, boot_docker_compose_mysql]
 
   ######## SERVERS ########
 
