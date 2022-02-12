@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+    db:
+        image: mysql/mysql-server
+        volumes:
+            - ~/.docker/mysql:/var/lib/mysql
+        ports:
+            - "3305:3306"
+        environment:
+            - MYSQL_DATABASE=enssapp
+            - MYSQL_ROOT_PASSWORD=pUr3&H0sHBabY

@@ -1,0 +1,7 @@
+version: '2'
+
+services:
+    nestjs:
+        image: enssapp/nestjs:latest
+        volumes:
+            - ~/.docker/www:/var/www/html

@@ -1,0 +1,4 @@
+FROM mysql/mysql-server
+ENV MYSQL_DATABASE=enssapp \
+    MYSQL_ROOT_PASSWORD=pUr3&H0sHBabY
+EXPOSE 3306:3306
