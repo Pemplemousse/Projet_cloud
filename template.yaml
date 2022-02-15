@@ -150,28 +150,21 @@ resources:
     properties:
       config: |
         #!/bin/sh
-        mkdir /config
-        echo "CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
-        GRANT ALL PRIVILEGES ON . TO 'username'@'localhost' WITH GRANT OPTION;
-        CREATE USER 'username'@'%' IDENTIFIED BY 'password';
-        GRANT ALL PRIVILEGES ON . TO 'username'@'%' WITH GRANT OPTION;
-        FLUSH PRIVILEGES;
-        " > /config/privilege.sql
-
         echo "version: '2'
         services:
             db:
-                image: mysql/mysql-server
-                container_name: sql
-                command: --init-file /config/privilege.sql
+                image: mysql
+                container_name: db
+                command: --default-authentication-plugin=mysql_native_password
                 volumes:
                     - ~/.docker/mysql:/var/lib/mysql
-                    - /config/privilege.sql:/config/privilege.sql
                 ports:
                     - 80:3306
                 environment:
                     - MYSQL_DATABASE=enssapp
-                    - MYSQL_ROOT_PASSWORD=1234
+                    - MYSQL_ROOT_PASSWORD=12rR8tY45
+                    - MYSQL_USER=user
+                    - MYSQL_PASSWORD=12rR8tY45
         " > docker-compose.yml
 
         cd / && docker-compose up

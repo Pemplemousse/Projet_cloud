@@ -19,7 +19,7 @@ RUN yarn install
 COPY . .
 EXPOSE 80:3000
 RUN npm run build
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:cloud"]
 ```
 
 L'image est construite dans le répertoire contenant le code de notre application, ce qui nous permet de le copier.
@@ -46,28 +46,31 @@ Sur cette infrastructure, il faut maintenant organiser nos containers et rendre 
 Pour décrire cette organisation, nous allons nous appuyer sur `docker-compose` :
 
 ```yaml
-# docker-compose MySQL
 version: '2'
 services:
     db:
-        image: mysql/mysql-server
+        image: mysql
+        container_name: db
+        command: --default-authentication-plugin=mysql_native_password
         volumes:
             - ~/.docker/mysql:/var/lib/mysql
         ports:
-            - "3305:3306"
+            - 80:3306
         environment:
             - MYSQL_DATABASE=enssapp
-            - MYSQL_ROOT_PASSWORD=shhhhhh
+            - MYSQL_ROOT_PASSWORD=12rR8tY45
+            - MYSQL_USER=user
+            - MYSQL_PASSWORD=12rR8tY45
 ```
 ```yaml
-# docker-compose Node
+# docker-compose Node.js
 version: '2'
 services:
     nestjs:
         image: enssapp/nestjs:latest
-        volumes:
-            - ~/.docker/www:/var/www/html
+        container_name: nest
+        ports:
+            - 80:3000
 ```
 
 Des composants de configuration (`OS::Heat::SoftwareConfig`) nous permettent d'écrire ces fichiers docker-compose à l'intérieur des VM. Ces fichiers seront exploités par ces VM une fois via docker (également présent sur ces machines).
-
