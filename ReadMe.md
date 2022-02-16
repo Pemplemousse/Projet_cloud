@@ -74,3 +74,23 @@ services:
 ```
 
 Des composants de configuration (`OS::Heat::SoftwareConfig`) nous permettent d'écrire ces fichiers docker-compose à l'intérieur des VM. Ces fichiers seront exploités par ces VM une fois via docker (également présent sur ces machines).
+
+
+## Requêtes vers le Back-end
+
+Voici quelques exemples de requêtes :
+
+Obtenir un "Hello World!"
+```
+curl 148.60.225.57/api -UseBasicParsing
+```
+
+Obtenir la liste des emplois du temps existants :
+```
+curl 148.60.225.57/api/schedule/all -UseBasicParsing
+```
+
+Obtenir l'emplois du temps des INFO3 en parcours IA court :
+```
+curl 148.60.225.57/api/schedule?timetable=INFO3_IA -UseBasicParsing
+```
