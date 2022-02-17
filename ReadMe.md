@@ -78,19 +78,25 @@ Des composants de configuration (`OS::Heat::SoftwareConfig`) nous permettent d'�
 
 ## Requêtes vers le Back-end
 
+**Attention: OpenStack requiert une dizaine de minute afin d'instancier les conteneurs.**
+
+De plus, **{@ip flottante}** désigne l'adresse ip flottante de la machine virtuelle 1 **08_projet_VM1**.
+
+Cette variable correspond à **148.60.225.93** pour le dernier déploiement.
+
 Voici quelques exemples de requêtes :
 
 Obtenir un "Hello World!"
 ```
-curl 148.60.225.57/api -UseBasicParsing
+curl {@ip flottante}/api -UseBasicParsing
 ```
 
 Obtenir la liste des emplois du temps existants :
 ```
-curl 148.60.225.57/api/schedule/all -UseBasicParsing
+curl {@ip flottante}/api/schedule/all -UseBasicParsing
 ```
 
 Obtenir l'emplois du temps des INFO3 en parcours IA court :
 ```
-curl 148.60.225.57/api/schedule?timetable=INFO3_IA -UseBasicParsing
+curl {@ip flottante}/api/schedule?timetable=INFO3_IA -UseBasicParsing
 ```
