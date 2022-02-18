@@ -1,2 +1,4 @@
 *.code-workspace
 *.pem
+template snapshots
+command.md

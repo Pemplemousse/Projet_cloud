@@ -135,11 +135,13 @@ resources:
     type: OS::Heat::CloudConfig
     properties:
       cloud_config:
-        chpasswd:
-          list: |
-            cloud-user:toto
-            root:toto
-          expire: False
+        users: 
+          - name: user
+            plain_text_passwd: toto
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            home: /
+            lock_passwd: false
+            shell: /bin/bash
 
   # Docker-compose :
 
